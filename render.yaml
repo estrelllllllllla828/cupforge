@@ -1,0 +1,9 @@
+# Render Blueprint — 连接 GitHub 后可一键部署
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: cupforge
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    region: oregon
