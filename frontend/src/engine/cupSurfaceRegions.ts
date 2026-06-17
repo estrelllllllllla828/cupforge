@@ -233,9 +233,11 @@ export function buildRegionMaskedPatternCanvas(
   ctx.fillStyle = `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`
   ctx.fillRect(0, 0, out.width, out.height)
 
-  const active = regions.length > 0 ? regions : [{ id: 'all', u0: 0, v0: 0, u1: 1, v1: 1 }]
+  if (regions.length === 0) {
+    return out
+  }
 
-  for (const region of active) {
+  for (const region of regions) {
     const rect = regionToPixelRect(region, out.width, out.height)
     ctx.save()
     ctx.beginPath()

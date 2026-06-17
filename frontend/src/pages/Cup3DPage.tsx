@@ -14,7 +14,7 @@ export const CUP_SHAPE_PILLS: { id: CupShapeId; label: string }[] = [
   { id: 'straight', label: '直杯' },
   { id: 'tea', label: '茶杯' },
   { id: 'goblet', label: '酒杯' },
-  { id: 'mug', label: '马克杯' },
+  { id: 'mug', label: '笔筒' },
   { id: 'vase', label: '花瓶' },
 ]
 
@@ -25,7 +25,7 @@ export const FALLBACK_CUP_CONFIG: CupConfig = {
   height: { default: 350, min: 220, max: 750 },
   shape_presets: {
     straight: { label: '直杯', points: [[200, 80], [203, 190], [206, 300], [209, 410], [212, 510]] },
-    mug: { label: '马克杯', points: [[198, 80], [198, 150], [198, 230], [199, 300], [200, 360]] },
+    mug: { label: '笔筒', points: [[198, 80], [198, 150], [198, 230], [199, 300], [200, 360]] },
     tea: { label: '茶杯', points: [[180, 80], [184, 120], [198, 165], [222, 210], [250, 250]] },
     goblet: { label: '酒杯', points: [[222, 80], [202, 150], [234, 230], [268, 310], [268, 400], [260, 470], [208, 540]] },
     vase: { label: '花瓶', points: [[216, 80], [236, 150], [198, 230], [188, 320], [216, 420], [230, 510]] },
@@ -186,6 +186,7 @@ export default function Cup3DPage({
             onChange={(surfaceRegions) => patch({ surfaceRegions })}
             patternCanvas={patternCanvas}
             modeLabel="贴图"
+            allowEmptyRegions
             outsideColor={[state.customColor[0], state.customColor[1], state.customColor[2]]}
           />
           <label className="cyber-color-row">

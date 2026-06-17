@@ -135,7 +135,11 @@ export default function Cup3DPreview({
 
     const positions = new Float32Array(meshData.positions)
 
-    const useTexture = surfaceMode === 'texture' && !!patternCanvas && patternCanvas.width > 0
+    const useTexture =
+      surfaceMode === 'texture'
+      && !!patternCanvas
+      && patternCanvas.width > 0
+      && surfaceRegions.length > 0
     const useRelief = reliefActive
 
     if (useRelief) {

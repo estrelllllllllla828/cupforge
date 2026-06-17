@@ -18,6 +18,8 @@ interface Props {
   modeLabel?: string
   /** 非贴图/非浮雕区域预览色 */
   outsideColor?: [number, number, number]
+  /** 允许删除全部区域（贴图流程：可不贴任何纹样） */
+  allowEmptyRegions?: boolean
 }
 
 const CANVAS_W = 480
@@ -29,6 +31,7 @@ export default function CupSurfaceRegionEditor({
   patternCanvas,
   modeLabel = '图案',
   outsideColor,
+  allowEmptyRegions = false,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [selectedId, setSelectedId] = useState<string>(() => regions[0]?.id ?? '')
@@ -217,7 +220,9 @@ export default function CupSurfaceRegionEditor({
   }
 
   const handleRemove = () => {
-    if (regions.length <= 1 || !selected) return
+    if (!selected) return
+    const minCount = allowEmptyRegions ? 0 : 1
+    if (regions.length <= minCount) return
     const next = regions.filter((r) => r.id !== selected.id)
     onChange(next)
     setSelectedId(next[next.length - 1]?.id ?? '')
@@ -235,7 +240,7 @@ export default function CupSurfaceRegionEditor({
             type="button"
             className="cyber-gradient-action remove"
             onClick={handleRemove}
-            disabled={regions.length <= 1}
+            disabled={allowEmptyRegions ? regions.length === 0 : regions.length <= 1}
             aria-label="删除区域"
           >
             ×
@@ -255,7 +260,11 @@ export default function CupSurfaceRegionEditor({
       />
       <p className="cup-surface-region-hint">
         靠近边缘/角点更易选中 · 拖动框体移动 · 拖控制点调整大小 · 可添加多块不连续{modeLabel}区域
-        {regions.length > 1 ? ` · 共 ${regions.length} 块` : ''}
+        {regions.length === 0
+          ? ` · 当前无${modeLabel}区域（整杯为杯体色）`
+          : regions.length > 1
+            ? ` · 共 ${regions.length} 块`
+            : ''}
       </p>
     </div>
   )
