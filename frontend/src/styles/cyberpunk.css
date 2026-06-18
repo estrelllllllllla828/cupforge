@@ -972,7 +972,25 @@
 }
 
 .cyber-cup3d-sidebar .cyber-btn-export {
+  margin: 0;
+}
+
+.cyber-export-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin: 0.75rem;
+}
+
+.cyber-export-actions .cyber-btn-export,
+.cyber-export-actions .cyber-btn-export-secondary {
+  width: 100%;
+  text-align: center;
+}
+
+.cyber-btn-export-secondary {
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
 }
 
 .cyber-back-link {

@@ -7,7 +7,7 @@ function wrap01(value: number): number {
   return ((value % 1) + 1) % 1
 }
 
-/** 按 UV 双线性采样高度图（0=凹陷，1=凸起） */
+/** 按 UV 双线性采样高度图（0=暗/低，1=亮/高） */
 function sampleHeightmapBilinear(
   data: Uint8ClampedArray,
   width: number,
@@ -61,7 +61,7 @@ export function buildHeightmapFromPattern(patternCanvas: HTMLCanvasElement): HTM
  * 位移垂直于杯壁表面，斜壁/弧壁也不会让浮雕图案产生形变。
  * 仅处理外壁顶点（前 outerVertexCount 个）。
  *
- * 高度图为灰度纹样：深色线条 = 高（凸起），浅色背景 = 低（平面）。
+ * 高度图灰度：亮纹区域相对暗底不动，暗底随方向位移，形成凸起/凹陷对比。
  */
 export function applyReliefDisplacement(
   positions: Float32Array,
@@ -96,7 +96,7 @@ export function applyReliefDisplacement(
     const regionMask = reliefRegionMaskFactor(u, v, surfaceRegions)
     if (regionMask <= 0) continue
 
-    // 反相：纹样线条作为浮雕主体，背景保持与杯壁齐平
+    // 反相：亮纹（线稿）保持相对高度，暗底随方向位移
     const h = 1 - sampleHeightmapBilinear(data, width, height, u, v)
     const offset = sign * h * reliefStrength * regionMask
 

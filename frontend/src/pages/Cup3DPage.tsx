@@ -3,6 +3,7 @@ import CupProfileEditor from '../components/CupProfileEditor'
 import CupSurfaceRegionEditor from '../components/CupSurfaceRegionEditor'
 import Cup3DPreview from '../components/Cup3DPreview'
 import { downloadBlob, exportCupMesh } from '../api/client'
+import { buildTexturedCupObjZip } from '../engine/cupObjExport'
 import { CUP_MATERIAL_DEFAULT, CUP_MATERIAL_PRESETS } from '../constants/cupMaterials'
 import type { AppConfig, CupConfig, CupEditorState, CupShapeId } from '../types'
 import { DEFAULT_GRADIENT_STOPS, DEFAULT_SURFACE_REGIONS } from '../types'
@@ -74,7 +75,7 @@ export default function Cup3DPage({
   const cupCfg: CupConfig = config?.cup ?? FALLBACK_CUP_CONFIG
 
   const [state, setState] = useState<CupEditorState>(() => createCupEditorState(cupCfg, 'texture'))
-  const [exporting, setExporting] = useState(false)
+  const [exporting, setExporting] = useState<'stl' | 'obj' | null>(null)
   const preview3dRef = useRef<HTMLDivElement>(null)
   const resetViewRef = useRef<(() => void) | null>(null)
 
@@ -87,15 +88,36 @@ export default function Cup3DPage({
     cup_height: state.cupHeight,
   }
 
-  const handleExport = async () => {
-    setExporting(true)
+  const handleExportStl = async () => {
+    setExporting('stl')
     try {
       const blob = await exportCupMesh('stl', meshRequest)
       downloadBlob(blob, 'cupforge_cup.stl')
     } catch (e) {
-      alert(e instanceof Error ? e.message : '导出失败')
+      alert(e instanceof Error ? e.message : 'STL 导出失败')
     } finally {
-      setExporting(false)
+      setExporting(null)
+    }
+  }
+
+  const handleExportObj = async () => {
+    setExporting('obj')
+    try {
+      const blob = await buildTexturedCupObjZip({
+        controlPoints: state.controlPoints,
+        centerX: cupCfg.center_x,
+        wallThickness: state.wallThickness,
+        cupHeight: state.cupHeight,
+        baseHeight: cupCfg.base_height,
+        patternCanvas,
+        surfaceRegions: state.surfaceRegions,
+        bodyColor: state.customColor,
+      })
+      downloadBlob(blob, 'cupforge_cup_textured.zip')
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'OBJ 导出失败')
+    } finally {
+      setExporting(null)
     }
   }
 
@@ -204,14 +226,24 @@ export default function Cup3DPage({
         </div>
         </div>
 
-        <button
-          type="button"
-          className="cyber-btn-primary cyber-btn-export"
-          disabled={exporting}
-          onClick={handleExport}
-        >
-          {exporting ? '导出中…' : '导出'}
-        </button>
+        <div className="cyber-export-actions">
+          <button
+            type="button"
+            className="cyber-btn-primary cyber-btn-export"
+            disabled={exporting !== null}
+            onClick={handleExportStl}
+          >
+            {exporting === 'stl' ? '导出中…' : '导出 STL'}
+          </button>
+          <button
+            type="button"
+            className="cyber-btn-glass cyber-btn-export-secondary"
+            disabled={exporting !== null}
+            onClick={handleExportObj}
+          >
+            {exporting === 'obj' ? '打包中…' : '导出 OBJ（含贴图）'}
+          </button>
+        </div>
       </aside>
 
       <div className="cyber-cup3d-viewport" ref={preview3dRef}>
